@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Request Form</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Latina:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Latina', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1, h2 {
+            color: #ffffff;
+            animation: fadeIn 0.5s;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            color: #6200ea;
+            transition: transform 0.2s;
+        }
+        .tooltip:hover {
+            transform: scale(1.1);
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .generate-headers-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #6200ea;
+            color: #ffffff;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+        .generate-headers-icon:hover {
+            background-color: #3700b3;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .alert {
+            padding: 15px;
+            background-color: #f44336;
+            color: white;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.5s;
+        }
+        .alert .closebtn {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: #222;
+            color: #ffffff;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #6200ea;
+            background-color: #333;
+            outline: none;
+        }
+        input.error, select.error, textarea.error {
+            border-color: red; /* Highlight invalid fields */
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #6200ea;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            animation: popIn 0.3s;
+        }
+        button:hover {
+            background-color: #3700b3;
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+        }
+        h2 {
+            margin-top: 40px;
+            animation: fadeIn 0.5s;
+        }
+        pre {
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s;
+            color: #e0e0e0;
+        }
+        .json-key {
+            color: #ffa726;
+        }
+        .json-string {
+            color: #f44336;
+        }
+        .json-number {
+            color: #64b5f6;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #aaaaaa;
+        }
+        .loading {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes popIn {
+            from { transform: scale(0.9); }
+            to { transform: scale(1); }
+        }
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        /* New Styles for Generate Headers Button */
+        .generate-headers-btn {
+            background-color: #6200ea;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            padding: 8px 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+            font-size: 0.9em;
+        }
+        .generate-headers-btn:hover {
+            background-color: #3700b3;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="alert">
+        New feature: You can now generate headers automatically! 
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    </div>
+
+    <form id="apiForm">
+        <label for="url">URL:</label>
+        <input type="text" id="url" required placeholder="https://api.example.com/endpoint">
+        <div id="urlFeedback" style="color: red; display: none;">Please enter a valid URL.</div>
+
+        <label for="method">Method:</label>
+        <select id="method" required>
+            <option value="">Select a method</option>
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="PATCH">PATCH</option>
+            <option value="HEAD">HEAD</option>
+            <option value="OPTIONS">OPTIONS</option>
+            <option value="TRACE">TRACE</option>
+        </select>
+
+        <label for="token">Uses token:
+            <span class="tooltip">
+                <i class="fas fa-question-circle"></i>
+                <span class="tooltiptext">Will your request require a user token?</span>
+            </span>
+        </label>
+        <select id="token" required>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+
+        <label for="payload">Payload (JSON):</label>
+        <textarea id="payload" placeholder='{"key": "value"}'></textarea>
+        <div id="payloadFeedback" style="color: red; display: none;">Please enter valid JSON.</div>
+
+        <label for="headers">Headers (JSON):</label>
+        <textarea id="headers" placeholder='{"Content-Type": "application/json"}'></textarea>
+        <button type="button" class="generate-headers-btn" onclick="generateHeaders()">
+            <i class="fas fa-sync-alt"></i> Generate Headers
+        </button>
+        <div id="headersFeedback" style="color: red; display: none;">Please enter valid JSON.</div>
+
+        <button type="submit" id="generateButton" disabled>Generate JSON</button>
+        <button type="button" id="clearButton">Clear</button>
+        <div class="loading" id="loading">Generating JSON... <i class="fas fa-spinner fa-spin"></i></div>
+    </form>
+
+    <h2>Generated JSON:</h2>
+    <pre id="output"></pre>
+    <button id="copyButton" style="display: none;">Copy to Clipboard</button>
+
+    <div id="toast" class="toast">JSON copied to clipboard!</div>
+
+    <footer>
+        &copy; 2024 API Form Generator
+    </footer>
+
+    <script>
+        const apiForm = document.getElementById('apiForm');
+        const urlInput = document.getElementById('url');
+        const generateButton = document.getElementById('generateButton');
+        const clearButton = document.getElementById('clearButton');
+        const output = document.getElementById('output');
+        const copyButton = document.getElementById('copyButton');
+        const loadingIndicator = document.getElementById('loading');
+        const urlFeedback = document.getElementById('urlFeedback');
+        const payloadFeedback = document.getElementById('payloadFeedback');
+        const headersFeedback = document.getElementById('headersFeedback');
+        const toast = document.getElementById('toast');
+
+        // Update button state
+        function updateButtonState() {
+            const urlValid = urlInput.value.trim() !== '';
+            const methodSelected = document.getElementById('method').value !== '';
+            generateButton.disabled = !(urlValid && methodSelected);
+        }
+
+        // Validate URL on input
+        urlInput.addEventListener('input', function() {
+            const urlPattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/i; // Simple URL validation
+            if (!urlPattern.test(urlInput.value.trim())) {
+                urlFeedback.style.display = 'block';
+                urlInput.classList.add('error');
+            } else {
+                urlFeedback.style.display = 'none';
+                urlInput.classList.remove('error');
+            }
+            updateButtonState();
+        });
+
+        // Enable button if all fields are valid
+        document.querySelectorAll('input, select, textarea').forEach(element => {
+            element.addEventListener('input', updateButtonState);
+        });
+
+        // Clear form
+        clearButton.addEventListener('click', function() {
+            apiForm.reset();
+            output.textContent = '';
+            copyButton.style.display = 'none';
+            updateButtonState();
+            urlFeedback.style.display = 'none';
+            payloadFeedback.style.display = 'none';
+            headersFeedback.style.display = 'none';
+            urlInput.classList.remove('error');
+            document.getElementById('payload').classList.remove('error');
+            document.getElementById('headers').classList.remove('error');
+        });
+
+        apiForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            loadingIndicator.style.display = 'block'; // Show loading
+            const url = urlInput.value;
+            const method = document.getElementById('method').value;
+            const token = document.getElementById('token').value;
+            const payload = document.getElementById('payload').value;
+            const headers = document.getElementById('headers').value;
+
+            // Validate JSON
+            let validPayload = true;
+            let validHeaders = true;
+            if (payload) {
+                try {
+                    JSON.parse(payload);
+                    document.getElementById('payload').classList.remove('error');
+                    payloadFeedback.style.display = 'none';
+                } catch (e) {
+                    validPayload = false;
+                    document.getElementById('payload').classList.add('error');
+                    payloadFeedback.style.display = 'block';
+                }
+            }
+            if (headers) {
+                try {
+                    JSON.parse(headers);
+                    document.getElementById('headers').classList.remove('error');
+                    headersFeedback.style.display = 'none';
+                } catch (e) {
+                    validHeaders = false;
+                    document.getElementById('headers').classList.add('error');
+                    headersFeedback.style.display = 'block';
+                }
+            }
+
+            // Check for valid input before generating JSON
+            if (!(validPayload && validHeaders)) {
+                loadingIndicator.style.display = 'none'; // Hide loading
+                return; // Stop execution
+            }
+
+            // Create the resulting JSON object
+            const result = {
+                url: url,
+                method: method,
+                token: token,
+                payload: payload ? JSON.parse(payload) : "",
+                headers: headers ? JSON.parse(headers) : {}
+            };
+
+            // Highlighting JSON syntax
+            let highlightedJson = JSON.stringify(result, null, 4)
+                .replace(/"([^"]+)":/g, '<span class="json-key">"$1":</span>')
+                .replace(/: "([^"]+)"/g, ': <span class="json-string">"$1"</span>')
+                .replace(/: (\d+)/g, ': <span class="json-number">$1</span>');
+
+            // Display the generated JSON
+            output.innerHTML = highlightedJson;
+            copyButton.style.display = 'inline'; // Show copy button
+            loadingIndicator.style.display = 'none'; // Hide loading
+        });
+
+        // Copy to clipboard
+        copyButton.addEventListener('click', function() {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = output.innerText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            
+            // Show toast notification
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000); // Toast visible for 2 seconds
+        });
+
+        async function generateHeaders() {
+        try {
+            // Fetch the contents of user_agents.txt
+            const response = await fetch('user_agents.txt');
+            if (!response.ok) throw new Error('Failed to load user agents file');
+            
+            // Read the file content as text
+            const text = await response.text();
+            
+            // Split content by lines and filter out any empty lines
+            const userAgentsArray = text.split('\n').filter(line => line.trim());
+
+            // Pick a random User-Agent string from the array
+            const randomUserAgent = userAgentsArray[Math.floor(Math.random() * userAgentsArray.length)];
+            
+            // Define headers JSON object with random User-Agent
+            const generatedHeaders = {
+                "User-Agent": randomUserAgent,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Connection": "keep-alive",
+                "Upgrade-Insecure-Requests": "1"
+            };
+
+            // Set the headers textarea with formatted JSON
+            document.getElementById("headers").value = JSON.stringify(generatedHeaders, null, 2);
+        } catch (error) {
+            console.error("Error generating headers:", error);
+            alert("Could not generate headers. Please check the file format or availability.");
+        }
+    }
+</script>
+</body>
+</html>
